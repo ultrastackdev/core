@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "build": "nest build",
+    "serve": "nest start --entryFile apps/app-admin/src/main.js --watch",
+    "copy": "cp -u dist/package.json tmp && npm run build && cp -u tmp dist/package.json "
+  }
+}

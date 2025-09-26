@@ -1,0 +1,20 @@
+name:  Default Deploy
+on:
+  workflow_dispatch:
+
+
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "null"
+    environment: manual
+  use-deploy-handler:
+    needs: [approve]
+    strategy:
+      matrix:
+        project_type: ["client", "server"]
+    uses: ./.github/workflows/handle-deploy.yml
+    with:
+      SUB_PROJECT_NAME: ${{ matrix.project_type }}
+    secrets: inherit

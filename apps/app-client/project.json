@@ -1,0 +1,84 @@
+{
+  "name": "app-client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/app-client",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "clean": {
+      "command": "rm -rf {projectRoot}/dist"
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.json --noEmit",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "apps/app-client"
+      },
+      "dependsOn": ["clean"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "fix": false
+      },
+      "dependsOn": ["typecheck"]
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "app-client:build",
+        "dev": true,
+        "port": 3000
+      }
+    },
+    "build:cache": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "development",
+      "options": {
+        "outputPath": "{options.outputPath}"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "{projectRoot}/dist",
+          "tags": ["app-client:latest"]
+        },
+        "production": {
+          "outputPath": "{projectRoot}/dist",
+          "tags": ["app-client:latest"]
+        }
+      },
+      "dependsOn": ["lint"]
+    },
+    "build": {
+      "command": "rm -rf {projectRoot}/dist/.next/cache",
+      "dependsOn": ["build:cache"]
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["build"],
+      "options": {
+        "engine": "docker",
+        "context": "{projectRoot}",
+        "metadata": {
+          "images": ["app-client"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
+      }
+    }
+  }
+}

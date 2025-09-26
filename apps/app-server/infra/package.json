@@ -1,0 +1,11 @@
+{
+  "name": "pulumi",
+  "devDependencies": {
+    "@types/node": "^18"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "3.115.0",
+    "@pulumi/pulumiservice": "^0.17.0",
+    "typescript": "^4.0.0"
+  }
+}

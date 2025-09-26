@@ -1,0 +1,28 @@
+name:  Admin Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "apps/app-admin/**"
+
+env:
+  PROJECT_NAME: athar-collab
+  SUB_PROJECT_NAME: admin
+
+jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "null"
+    outputs:
+      PROJECT_NAME: ${{ env.PROJECT_NAME }}
+      SUB_PROJECT_NAME: ${{ env.SUB_PROJECT_NAME }}
+
+  use-deploy-handler:
+    needs: [set-vars]
+    uses: ./.github/workflows/handle-deploy.yml
+    with:
+      PROJECT_NAME: ${{ needs.set-vars.outputs.PROJECT_NAME }}
+      SUB_PROJECT_NAME: ${{ needs.set-vars.outputs.SUB_PROJECT_NAME }}
+    secrets: inherit

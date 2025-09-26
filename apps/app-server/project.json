@@ -1,0 +1,70 @@
+{
+  "name": "app-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/app-server/src",
+  "projectType": "application",
+  "targets": {
+    "clean": {
+      "command": "rm -rf || rimraf  {projectRoot}/dist"
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.app.json --noEmit",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "apps/app-server"
+      },
+      "dependsOn": ["clean"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "fix": true
+      },
+      "dependsOn": ["typecheck"]
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "dependsOn": ["build"],
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "app-server:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "app-server:build:development"
+        },
+        "production": {
+          "buildTarget": "app-server:build:production"
+        }
+      }
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["build"],
+      "options": {
+        "engine": "docker",
+        "context": "{projectRoot}",
+        "metadata": {
+          "images": ["app-server"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
+      }
+    }
+  },
+  "tags": [
+    "server"
+  ]
+}

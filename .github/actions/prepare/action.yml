@@ -1,0 +1,55 @@
+name:  Prepare
+description: "Prepare  Pipeline"
+
+inputs:
+  project-type:
+    description: "Project type: client | server | global"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - name: Set ENV
+      run: |
+          echo "STACK_NAME=$(echo pr-${{ github.event.repository.name }}-${{ inputs.project-type }}-${{ github.event.number }})" >> $GITHUB_ENV
+          echo "PROJECT_NAME=$(echo ${{ github.event.repository.name }})" >> $GITHUB_ENV
+      shell: bash
+# name:  Prepare
+# description: "Prepare  Pipeline"
+
+# inputs:
+#   aws-access-key-id:
+#     description: "AWS_ACCESS_KEY_ID"
+#     required: true
+#   aws-secret-access-key:
+#     description: "AWS_SECRET_ACCESS_KEY"
+#     required: true
+#   aws-region:
+#     description: "AWS_REGION"
+#     required: true
+#   project-type:
+#     description: "Project type: client | server | global"
+#     required: true
+
+# runs:
+#   using: "composite"
+#   steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         fetch-depth: 1
+#     - name: Set ENV
+#       run: echo "STACK_NAME=$(echo pr-${{ github.event.repository.name }}-${{ inputs.project-type }}-${{ github.event.number }})" >> $GITHUB_ENV
+#       shell: bash
+#     - name: Use Node.js
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: "20.x"
+#     - name: Configure AWS Credentials
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ inputs.aws-access-key-id }}
+#         aws-region: ${{ inputs.aws-region }}
+#         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}

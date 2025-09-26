@@ -1,0 +1,23 @@
+name: Admin PR Handler
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, closed, synchronize, reopened]
+    paths:
+      - "apps/app-admin/**"
+env:
+  SUB_PROJECT_NAME: admin
+jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "null"
+    outputs:
+      SUB_PROJECT_NAME: ${{ env.SUB_PROJECT_NAME }}
+
+  use-pr-handler:
+    needs: [set-vars]
+    uses: ./.github/workflows/handle-pr.yml
+    with:
+      SUB_PROJECT_NAME: ${{ needs.set-vars.outputs.SUB_PROJECT_NAME }}
+    secrets: inherit

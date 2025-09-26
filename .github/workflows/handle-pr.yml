@@ -1,0 +1,95 @@
+name:  PR Handler
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ENV:
+        default: dev
+        type: string
+      SUB_PROJECT_NAME:
+        required: true
+        type: string
+    secrets:
+      PULUMI_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  preview:
+    if: ${{ github.event.pull_request.state == 'open' }}
+    name: Preview ${{inputs.SUB_PROJECT_NAME}}
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Prepare ENV
+        uses: ./.github/actions/prepare
+        with:
+          project-type: ${{inputs.SUB_PROJECT_NAME}}
+      - run: npm install
+      - run: npm install
+        working-directory: infra
+      - run: |
+          curl -fsSL https://get.pulumi.com/esc/install.sh | sh &&
+          PATH=$PATH:/home/runner/.pulumi/bin &&
+          pulumi org set-default ${{ vars.ORG_NAME }} &&
+          esc env open ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{ inputs.ENV }} > tmp &&
+          jq -r '.pulumiConfig | to_entries|map("\(.key)=\(.value|tojson)")|.[]' tmp >> ./apps/app-${{inputs.SUB_PROJECT_NAME}}/.env &&
+          npx nx@18.1.2 build app-${{inputs.SUB_PROJECT_NAME}}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          NEXT_PUBLIC_IS_PR: true
+
+      - name: Run  Deploy
+        run: |
+          cd apps/app-${{inputs.SUB_PROJECT_NAME}}/infra && npm i && pulumi org set-default ${{ vars.ORG_NAME }} &&
+          printf "name: ${{ env.PROJECT_NAME }}\nruntime: nodejs\nconfig:\nenvironment:\n - ${{ env.PROJECT_NAME}}/dev\n" > .yml &&
+          (pulumi stack select ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{ env.STACK_NAME }}) || (pulumi stack init ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{ env.STACK_NAME }}) &&
+          pulumi config env add ${{ env.PROJECT_NAME}}/dev --yes &&
+          ls -a &&
+          cat .yml &&
+          pulumi up --yes
+        shell: bash
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: VALIDATE OUTPUT
+        run: |
+          cd apps/app-${{inputs.SUB_PROJECT_NAME}}/infra && INSTANCE_URL=$(pulumi stack output output --json | jq '.url')
+          timeout 25  bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' '$INSTANCE_URL')" != "200" ]]; do echo Waiting for '$INSTANCE_URL' to be up; sleep 5; done' || false
+          echo $INSTANCE_URL
+        shell: bash
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  check-preview:
+    needs: preview
+    uses: ./.github/workflows/check.yml
+
+  destroy:
+    if: ${{ github.event.pull_request.merged || github.event.pull_request.state == 'closed' }}
+    name: Destory Preview ${{inputs.SUB_PROJECT_NAME}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Prepare ENV
+        uses: ./.github/actions/prepare
+        with:
+          project-type: ${{inputs.SUB_PROJECT_NAME}}
+      - run: npm install
+        working-directory: apps/app-${{inputs.SUB_PROJECT_NAME}}/infra
+      - name: Run  Destroy
+        run: |
+          cd apps/app-${{inputs.SUB_PROJECT_NAME}}/infra && npm i && pulumi org set-default ${{ vars.ORG_NAME }} &&
+          printf "name: ${{ env.PROJECT_NAME }}\nruntime: nodejs\nconfig:\nenvironment:\n - ${{ env.PROJECT_NAME}}/dev\n" > .yml &&
+          pulumi stack select ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{ env.STACK_NAME }} &&
+          pulumi destroy --remove --refresh --yes
+        shell: bash
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  check-destroy:
+    needs: destroy
+    uses: ./.github/workflows/check.yml

@@ -1,0 +1,24 @@
+name:  Server Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "apps/app-server/**"
+env:
+  SUB_PROJECT_NAME: server
+
+jobs:
+  set-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "null"
+    outputs:
+      SUB_PROJECT_NAME: ${{ env.SUB_PROJECT_NAME }}
+
+  use-deploy-handler:
+    needs: [set-vars]
+    uses: ./.github/workflows/handle-deploy.yml
+    with:
+      SUB_PROJECT_NAME: ${{ needs.set-vars.outputs.SUB_PROJECT_NAME }}
+    secrets: inherit

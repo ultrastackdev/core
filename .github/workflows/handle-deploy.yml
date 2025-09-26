@@ -1,0 +1,60 @@
+name:  Deploy Handler
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ENV:
+        default: dev
+        type: string
+      SUB_PROJECT_NAME:
+        required: true
+        type: string
+    secrets:
+      PULUMI_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  build-and-deploy:
+    name: ${{inputs.SUB_PROJECT_NAME}} build and deploy
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@main
+        with:
+          node-version-file: package.json
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.x"
+      - run: rm -rf dist
+      - name: Prepare ENV
+        uses: ./.github/actions/prepare
+        with:
+          project-type: ${{inputs.SUB_PROJECT_NAME}}
+      - run: npm i
+      - run: npm i
+        working-directory: infra
+      - run: |
+          curl -fsSL https://get.pulumi.com/esc/install.sh | sh &&
+          PATH=$PATH:/home/runner/.pulumi/bin &&
+          pulumi org set-default ${{ vars.ORG_NAME }} &&
+          esc env open ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{ inputs.ENV }} > tmp &&
+          jq -r '.pulumiConfig | to_entries|map("\(.key)=\(.value|tojson)")|.[]' tmp >> ./apps/app-${{inputs.SUB_PROJECT_NAME}}/.env &&
+          npx nx@18.1.2 build app-${{inputs.SUB_PROJECT_NAME}}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      
+      - name: Run script file
+        run: |
+          cd apps/app-${{inputs.SUB_PROJECT_NAME}}/infra && npm i && pulumi org set-default ${{ vars.ORG_NAME }} &&
+          printf "name: ${{ env.PROJECT_NAME }}\nruntime: nodejs\nconfig:\nenvironment:\n - ${{ env.PROJECT_NAME}}/dev\n" > .yml &&
+          (pulumi stack select ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{inputs.SUB_PROJECT_NAME}}-${{ inputs.ENV }}) || (pulumi stack init ${{ vars.ORG_NAME }}/${{ env.PROJECT_NAME}}/${{inputs.SUB_PROJECT_NAME}}-${{ inputs.env }}) &&
+          pulumi config env add ${{ env.PROJECT_NAME}}/${{ inputs.ENV }} --yes &&
+          ls -a &&
+          cat .yml &&
+          pulumi up --yes
+        shell: bash
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

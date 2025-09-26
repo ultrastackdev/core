@@ -1,0 +1,112 @@
+{
+  "name": "app-admin",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/app-admin/src",
+  "projectType": "application",
+  "targets": {
+    "clean": {
+      "command": "rm -rf {projectRoot}/dist"
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "tsc -p tsconfig.json --noEmit",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "apps/app-admin"
+      },
+      "dependsOn": ["clean"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "fix": true
+      },
+      "dependsOn": ["typecheck"]
+    },
+
+    "serve": {
+      "executor": "nx:run-script",
+      "defaultConfiguration": "development",
+      "options": {
+        "script": "serve",
+        "buildTarget": "app-admin:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "app-admin:build:development"
+        },
+        "production": {
+          "buildTarget": "app-admin:build:production"
+        }
+      }
+    },
+    "build": {
+      "executor": "nx:run-script",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "development",
+      "options": {
+        "script": "build",
+        "outputPath": "{options.outputPath}"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "{projectRoot}/dist",
+          "tags": ["app-admin:latest"]
+        },
+        "production": {
+          "outputPath": "{projectRoot}/dist",
+          "tags": ["app-admin:latest"]
+        }
+      },
+      "dependsOn": ["lint", "copy"]
+    },
+    "copy": {
+      "executor": "nx:run-script",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "development",
+      "options": {
+        "waitUntilTargets": ["build:docker"],
+        "script": "copy"
+      },
+      "dependsOn": ["build:docker"]
+    },
+
+    "build:docker": {
+      "executor": "@nx/webpack:webpack",
+      "inputs": ["production", "^production"],
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "{projectRoot}/dist",
+        "outputFileName": "main.js",
+        "bundle": false,
+        "buildTarget": "app-admin:build",
+        "webpackConfig": "{projectRoot}/webpack.config.js"
+      }
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["copy"],
+      "options": {
+        "engine": "docker",
+        "context": "{projectRoot}",
+        "metadata": {
+          "images": ["app-admin"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
+      }
+    }
+  },
+  "tags": ["admin"]
+}
