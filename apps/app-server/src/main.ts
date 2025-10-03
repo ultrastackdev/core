@@ -21,7 +21,7 @@ async function bootstrap() {
         const messages = errors.flatMap((error) => Object.values(error.constraints));
         return new BadRequestException({ message: messages, error: 'Bad Request', statusCode: 400 });
       },
-    })
+    }),
   );
 
   const config = new DocumentBuilder()
