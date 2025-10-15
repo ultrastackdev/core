@@ -1,0 +1,15 @@
+{
+  "name": "app-mobile",
+  "dependencies": {
+    "@capacitor/ios": "../../node_modules/@capacitor/ios",
+    "@capacitor/android": "../../node_modules/@capacitor/android"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3"
+  },
+  "scripts": {
+    "build": "node ../../node_modules/next/dist/bin/next build",
+    "dev": "node ../../node_modules/next/dist/bin/next dev -p 3000",
+    "preview": "npx --yes serve -s out -l 3000"
+  }
+}

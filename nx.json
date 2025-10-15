@@ -59,7 +59,8 @@
         "targetName": "e2e",
         "componentTestingTargetName": "component-test"
       }
-    }
+    },
+    "@nxext/capacitor/plugin"
   ],
   "generators": {
     "@nx/next": {
