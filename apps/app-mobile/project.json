@@ -6,217 +6,125 @@
   "tags": [],
   "// targets": "to see all targets run: nx show project app-mobile --web",
   "targets": {
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rm -rf {projectRoot}/out",
+        "cwd": "apps/app-mobile"
+      }
+    },
     "build": {
       "executor": "@nx/next:build",
       "outputs": ["{projectRoot}/out"],
       "options": {
         "outputPath": "apps/app-mobile/out"
-      }
+      },
+      "dependsOn": ["clean"]
     },
     "serve": {
       "executor": "@nx/next:server",
       "options": {
         "buildTarget": "app-mobile:build",
-        "port": 3000,
+        "port": 4000,
         "hostname": "0.0.0.0"
       }
     },
-    "cap:run:web": {
-      "executor": "@nx/next:server",
-      "options": {
-        "port": 3000,
-        "hostname": "0.0.0.0"
-      }
-    },
-    "cap:run:android": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap run android -l",
-        "cwd": "apps/app-mobile",
-        "args": ["--target"]
-      
-      }
-    },
-    "cap:run:ios": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap run ios",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:sync": {
+
+    "sync": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap sync",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:sync:android": {
+
+    "android:sync": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap sync android",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:sync:ios": {
+    "android:run:live:emulator": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx cap sync ios",
+        "command": "npx cap run android -l --host=10.0.2.2 --port=4000",
         "cwd": "apps/app-mobile"
-      }
+      },
+
+      "dependsOn": ["serve"]
     },
-    "cap:sync:web": {
+
+    "android:run:live:target": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx cap sync web",
-        "cwd": "apps/app-mobile"
-      }
+        "command": "npx cap run android -l --port=4000",
+        "cwd": "apps/app-mobile",
+        "args": ["--target"]
+      },
+
+      "dependsOn": ["serve"]
     },
-    "cap:copy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap copy",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:copy:android": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap copy android",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:copy:ios": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap copy ios",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:copy:web": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap copy web",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:add:android": {
+
+    "android:add": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap add android",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:add:ios": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap add ios",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:remove:android": {
+
+    "android:remove": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap remove android",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:remove:ios": {
+
+    "ios:add": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx cap add ios",
+        "cwd": "apps/app-mobile"
+      }
+    },
+
+    "ios:remove": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap remove ios",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:list": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap ls",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:open:android": {
+
+    "android:open": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap open android",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:open:ios": {
+    "ios:open": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap open ios",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:doctor": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap doctor",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:doctor:android": {
+
+    "android:doctor": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap doctor android",
         "cwd": "apps/app-mobile"
       }
     },
-    "cap:doctor:ios": {
+    "ios:doctor": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap doctor ios",
         "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:config": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap config",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:clean": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "rm -rf out",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:clean:android": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap clean android",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "cap:clean:ios": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "npx cap clean ios",
-        "cwd": "apps/app-mobile"
-      }
-    },
-    "mobile:build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "nx cap:clean app-mobile",
-          "nx build app-mobile",
-          "nx cap:sync app-mobile"
-        ],
-        "parallel": false
-      }
-    },
-    "mobile:run:android": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "nx serve app-mobile",
-          "nx cap:run:android app-mobile"
-        ],
-        "parallel": true
       }
     }
   }

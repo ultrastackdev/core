@@ -22,7 +22,7 @@ function getLocalIpAddress(): string {
 
   // Prefer WiFi/Ethernet interfaces
   const preferredInterfaces = ['Wi-Fi', 'Ethernet', 'en0', 'eth0', 'wlan0'];
-  
+
   for (const interfaceName of preferredInterfaces) {
     if (results[interfaceName] && results[interfaceName].length > 0) {
       return results[interfaceName][0];
@@ -35,7 +35,7 @@ function getLocalIpAddress(): string {
 }
 
 const localIp = getLocalIpAddress();
-const serverUrl = `http://${localIp}:3000`;
+const serverUrl = `http://0.0.0.0:4000`;
 
 const config: CapacitorConfig = {
   appId: 'com.example.app',
@@ -43,7 +43,7 @@ const config: CapacitorConfig = {
   webDir: 'out/.next',
   server: {
     url: serverUrl,
-    cleartext: true
+    cleartext: true,
   },
 };
 
