@@ -1,28 +1,28 @@
-# Production image, copy all the files and run next
-FROM docker.io/node:lts-alpine as prepare
-WORKDIR /usr/src/app
-COPY ./.npmrc ./
-COPY package.json .
-RUN npm i
-RUN npm i next
+ARG NODE_VERSION=24.14.1-slim
 
+FROM docker.io/node:${NODE_VERSION} AS runner
 
-FROM docker.io/node:lts-alpine as runner
+WORKDIR /app
 
-WORKDIR /usr/src/app
-ENV PORT 3000
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-COPY --from=prepare /usr/src/app/node_modules ./node_modules
-COPY dist .
-RUN chown -R node:node .
-USER node
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy full standalone output (root node_modules + apps/ directory)
+COPY --chown=nextjs:nodejs dist/standalone ./
+
+# Copy static assets where server.js expects them (dist/static relative to __dirname)
+COPY --chown=nextjs:nodejs dist/static ./apps/app-client/dist/static
+
+# Copy public assets where server.js expects them (public relative to __dirname)
+COPY --chown=nextjs:nodejs public ./apps/app-client/public
+
+USER nextjs
+
 EXPOSE 3000
-# COPY --chown=node:node ./tools/scripts/entrypoints/api.sh /usr/local/bin/docker-entrypoint.sh
-# ENTRYPOINT [ "docker-entrypoint.sh" ]
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry.
-ENV NEXT_TELEMETRY_DISABLED 1
 
-
-CMD ["node_modules/.bin/next", "start"]
+CMD ["node", "apps/app-client/server.js"]

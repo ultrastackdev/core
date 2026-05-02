@@ -2,207 +2,103 @@
 
 This is a Next.js mobile application integrated with CapacitorJS for cross-platform mobile development.
 
-## 🚀 Quick Start
+## Prerequisites
 
-### Prerequisites
-- Node.js and npm installed
-- Android Studio (for Android development)
-- Xcode (for iOS development, macOS only)
+- Node.js and npm
+- Android Studio (Android)
+- Xcode (iOS, macOS only)
 
-### Initial Setup
-```bash
-# Build the web app and sync with mobile platforms
-nx mobile:build app-mobile
-```
-
-## 📱 Available Commands
-
-### 🔄 Sync Commands
-Sync web assets and Capacitor configuration with native platforms:
+## Quick Start
 
 ```bash
-# Sync all platforms
-nx cap:sync app-mobile
+# Build web assets
+nx run app-mobile:build
 
-# Sync specific platforms
-nx cap:sync:android app-mobile      # sync Android
-nx cap:sync:ios app-mobile          # sync iOS
-nx cap:sync:web app-mobile          # sync Web
+# Sync Capacitor with native projects
+nx run app-mobile:sync
+
+# Run Android with live reload (emulator)
+nx run app-mobile:android:run:live:emulator
 ```
 
-### 📋 Copy Commands
-Copy web assets to native platforms without updating native dependencies:
+## Commands
 
-```bash
-# Copy to all platforms
-nx cap:copy app-mobile
+### Build & Clean
 
-# Copy to specific platforms
-nx cap:copy:android app-mobile
-nx cap:copy:ios app-mobile
-nx cap:copy:web app-mobile
-```
+- `nx run app-mobile:clean` — Remove `apps/app-mobile/out` directory.
+- `nx run app-mobile:build` — Build web assets (outputs to `apps/app-mobile/out`).
 
-### ➕ Platform Management
-Add or remove native platforms:
+### Development Server
 
-```bash
-# Add platforms
-nx cap:add:android app-mobile       # add Android
-nx cap:add:ios app-mobile           # add iOS
+- `nx run app-mobile:serve` — Start dev server on `0.0.0.0:4000`.
 
-# Remove platforms
-nx cap:remove:android app-mobile    # remove Android
-nx cap:remove:ios app-mobile        # remove iOS
+### Sync
 
-# List available platforms
-nx cap:list app-mobile
-```
+- `nx run app-mobile:sync` — Sync all Capacitor platforms.
+- `nx run app-mobile:android:sync` — Sync Android platform only.
+- `nx run app-mobile:ios:sync` — Sync iOS platform only.
 
-### 🚀 Development & Serving
+### Android
 
-#### Web Development
-```bash
-# Serve web app (default)
-nx serve app-mobile
+#### Running
 
-# Serve web app (explicit)
-nx cap:run:web app-mobile
-```
+- `nx run app-mobile:android:run:live:emulator` — Run with live reload on Android emulator (starts server, uses host `10.0.2.2`).
+- `nx run app-mobile:android:run:live:target <device-id>` — Run with live reload on specific Android device (requires HOST env var).
+- `nx run app-mobile:android:run` — Run Android app with live reload (requires HOST env var).
 
-#### Mobile Development
-```bash
-# Run on Android device/emulator
-nx cap:run:android app-mobile
+#### Platform Management
 
-# Run on iOS simulator/device
-nx cap:run:ios app-mobile
-```
+- `nx run app-mobile:android:add` — Add Android platform (depends on build).
+- `nx run app-mobile:android:init` — Starts Android dev (depends on builds, adds android, sync).
+- `nx run app-mobile:android:remove` — Remove Android platform.
+- `nx run app-mobile:android:open` — Open Android Studio.
 
-#### Open Native IDEs
-```bash
-# Open Android Studio
-nx cap:open:android app-mobile
+#### Build & Diagnostics
 
-# Open Xcode
-nx cap:open:ios app-mobile
-```
+- `nx run app-mobile:build:debug:android` — Build debug APK (outputs to `android/app/build/outputs/apk/debug/`, depends on android:start).
+- `nx run app-mobile:android:doctor` — Check Android development environment.
 
-### 🔧 Diagnostics & Maintenance
+#### Get SHA1 for live reload build
 
-#### Environment Diagnostics
-```bash
-# Check Capacitor environment
-nx cap:doctor app-mobile
+run `./gradlew signingReport` inside android folder
 
-# Check Android-specific environment
-nx cap:doctor:android app-mobile
+### iOS
 
-# Check iOS-specific environment
-nx cap:doctor:ios app-mobile
-```
+#### Running
 
-#### Configuration & Cleanup
-```bash
-# Open Capacitor configuration
-nx cap:config app-mobile
+- `nx run app-mobile:ios:run:live:emulator` — Run with live reload on iOS simulator (starts server).
+- `nx run app-mobile:ios:run:live:target <device-id>` — Run with live reload on specific iOS device.
 
-# Clean build outputs and native syncs
-nx cap:clean app-mobile
-nx cap:clean:android app-mobile
-nx cap:clean:ios app-mobile
-```
+#### Platform Management
 
-### 🏗️ Build Pipeline
-```bash
-# Combined build and sync (recommended for deployment)
-nx mobile:build app-mobile
-```
+- `nx run app-mobile:ios:add` — Add iOS platform.
+- `nx run app-mobile:ios:remove` — Remove iOS platform.
+- `nx run app-mobile:ios:open` — Open Xcode.
 
-## 📁 Project Structure
+#### Diagnostics
 
-```
-apps/app-mobile/
-├── src/                    # Next.js source code
-├── public/                 # Static assets
-├── out/                    # Build output (generated)
-├── android/                # Android native project (generated)
-├── ios/                    # iOS native project (generated)
-├── capacitor.config.ts     # Capacitor configuration
-├── next.config.js          # Next.js configuration
-└── project.json           # Nx project configuration
-```
+- `nx run app-mobile:ios:doctor` — Check iOS development environment (macOS only).
 
-## ⚙️ Configuration Files
+## Environment Configuration
 
-### Capacitor Configuration
-- **File**: `capacitor.config.ts`
-- **Purpose**: Defines app ID, name, and web directory
-- **Web Directory**: `out/.next` (Next.js static export output)
+### Setup
 
-### Next.js Configuration
-- **File**: `next.config.js`
-- **Key Settings**:
-  - `output: 'export'` - Enables static export for Capacitor
-  - `images.unoptimized: true` - Disables image optimization for static export
+1. Copy `.env.example` to `.env`:
 
-## 🔄 Development Workflow
-
-1. **Start Development**:
    ```bash
-   nx serve app-mobile
+   cp .env.example .env
    ```
 
-2. **Build and Test Mobile**:
+2. Configure your environment:
+
    ```bash
-   nx mobile:build app-mobile
+   # For production builds (APK)
+   BUILD_ENV=production
+   HOST=<Local IP>
    ```
 
-3. **Open Native IDE**:
-   ```bash
-   # For Android
-   nx cap:open:android app-mobile
-   
-   # For iOS
-   nx cap:open:ios app-mobile
-   ```
+### How It Works
 
-4. **Run on Device**:
-   ```bash
-   # Android
-   nx mobile:run:android app-mobile
-   
-   # iOS
-   nx cap:run:ios app-mobile
-   ```
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Build Errors**: Ensure all API routes have `export const dynamic = 'force-static';` for static export compatibility.
-
-2. **Sync Issues**: Run `nx cap:clean app-mobile` followed by `nx mobile:build app-mobile`.
-
-3. **Platform Issues**: Use `nx cap:doctor app-mobile` to check environment setup.
-
-### Environment Setup
-
-- **Android**: Ensure Android Studio and Android SDK are properly installed
-- **iOS**: Ensure Xcode and iOS SDK are installed (macOS only)
-- **CocoaPods**: Install for iOS development: `sudo gem install cocoapods`
-
-## 📚 Additional Resources
-
-- [Capacitor Documentation](https://capacitorjs.com/docs)
-- [Next.js Static Export](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)
-- [Nx Documentation](https://nx.dev)
-
-## 🎯 Key Features
-
-- ✅ Cross-platform mobile development (iOS & Android)
-- ✅ Next.js with static export for Capacitor compatibility
-- ✅ Comprehensive Nx command integration
-- ✅ Hot reload development workflow
-- ✅ Native IDE integration
-- ✅ Automated build and sync pipeline
+- **`BUILD_ENV=development`**: App connects to dev server (`http://0.0.0.0:4000`) for live reload
+- **`BUILD_ENV=production`** or empty: App uses bundled assets (for APK builds)
+- **`HOST=<Local IP>`** for running live reload apps on Android

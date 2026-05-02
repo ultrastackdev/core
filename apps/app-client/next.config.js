@@ -1,18 +1,21 @@
-const { withNx } = require('@nx/next');
+//@ts-check
 
+const { composePlugins, withNx } = require('@nx/next');
+
+/**
+ * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
+ **/
 const nextConfig = {
-  nx: {
-    svgr: false,
-  },
+  output: 'standalone',
+  distDir: 'dist',
+  // Use this to set Nx-specific options
+  // See: https://nx.dev/recipes/next/next-config-setup
+  nx: {}
 };
 
-const plugins = [];
+const plugins = [
+  // Add more Next.js plugins to this list if needed.
+  withNx
+];
 
-module.exports = async (phase, context) => {
-  let updatedConfig = plugins.reduce((acc, fn) => fn(acc), nextConfig);
-
-  // Apply the async function that `withNx` returns.
-  updatedConfig = await withNx(updatedConfig)(phase, context);
-
-  return updatedConfig;
-};
+module.exports = composePlugins(...plugins)(nextConfig);

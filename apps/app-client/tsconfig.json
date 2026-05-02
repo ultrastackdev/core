@@ -1,42 +1,62 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "jsx": "preserve",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "emitDeclarationOnly": false,
+    "esModuleInterop": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "types": [
-      "jest",
-      "node"
-    ]
+    "paths": {
+      "@/*": ["./src/*"],
+      "@shared/front": ["../../libs/frontend-shared/src"],
+      "@shared/front/*": ["../../libs/frontend-shared/src/*"],
+      "@entities": ["../../libs/entities/src"],
+      "@enums": ["../../libs/enums/src"],
+      "@interfaces": ["../../libs/interfaces/src"],
+      "@constants": ["../../libs/constants/src"],
+      "@schemas": ["../../libs/schemas/src"]
+    },
+    "outDir": "out-tsc",
+    "tsBuildInfoFile": "out-tsc/tsconfig.tsbuildinfo"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    "../../apps/app-client/.next/types/**/*.ts",
-    "../../dist/apps/app-client/.next/types/**/*.ts",
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
-    "../../apps/app-client/dist/.next/types/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    ".next/**/*.ts",
+    ".next/**/*.tsx",
+    "dist/types/**/*.ts",
+    "../../dist/apps/app-client/dist/types/**/*.ts",
+    "next-env.d.ts"
   ],
   "exclude": [
-    "infra",
+    "out-tsc",
+    "dist",
     "node_modules",
     "jest.config.ts",
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "jest.config.cts",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    ".next",
+    "eslint.config.js",
+    "eslint.config.cjs",
+    "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/frontend-shared"
+    }
   ]
 }

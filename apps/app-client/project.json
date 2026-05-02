@@ -1,65 +1,36 @@
 {
-  "name": "app-client",
+  "name": "@new-ultrastack/app-client",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/app-client",
   "projectType": "application",
   "tags": [],
   "targets": {
     "clean": {
-      "command": "rm -rf {projectRoot}/dist"
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true});\""
+      }
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          {
-            "command": "tsc -p tsconfig.json --noEmit",
-            "forwardAllArgs": false
-          }
-        ],
-        "cwd": "apps/app-client"
+        "commands": [{ "command": "tsc -p tsconfig.json --noEmit", "forwardAllArgs": false }],
+        "cwd": "{projectRoot}"
       },
-      "dependsOn": ["clean"]
+      "dependsOn": ["clean", "^typecheck"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
-      "options": {
-        "fix": false
-      },
+      "options": { "fix": false },
       "dependsOn": ["typecheck"]
     },
     "serve": {
-      "executor": "@nx/next:server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "app-client:build",
-        "dev": true,
-        "port": 3000
-      }
-    },
-    "build:cache": {
-      "executor": "@nx/next:build",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "development",
-      "options": {
-        "outputPath": "{options.outputPath}"
-      },
-      "configurations": {
-        "development": {
-          "outputPath": "{projectRoot}/dist",
-          "tags": ["app-client:latest"]
-        },
-        "production": {
-          "outputPath": "{projectRoot}/dist",
-          "tags": ["app-client:latest"]
-        }
-      },
-      "dependsOn": ["lint"]
+      "options": { "port": 3000 }
     },
     "build": {
-      "command": "rm -rf {projectRoot}/dist/.next/cache",
-      "dependsOn": ["build:cache"]
+      "dependsOn": ["lint"]
     },
     "container": {
       "executor": "@nx-tools/nx-container:build",

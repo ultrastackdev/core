@@ -1,27 +1,33 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "composite": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
     "importHelpers": true,
-    "target": "es2015",
+    "isolatedModules": true,
+    "lib": ["es2022"],
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "moduleResolution": "bundler",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "strict": true,
     "baseUrl": ".",
-    "resolveJsonModule": true,
+    "target": "es2022",
+    "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@ultra-stack/entities": ["libs/entities/src"],
-      "src": ["apps/app-client/src"]
-    }
-  },
-  "ts-node": {
-    "require": ["tsconfig-paths/register"]
-  },
-  "exclude": ["node_modules", "tmp"]
+      "@/*": ["./*"],
+      "@entities": ["libs/entities/src"],
+      "@enums": ["libs/enums/src"],
+      "@interfaces": ["libs/interfaces/src"],
+      "@constants": ["libs/constants/src"],
+      "@schemas": ["libs/schemas/src"],
+      "@shared/front": ["libs/frontend-shared/src"],
+      "@shared/front/*": ["libs/frontend-shared/src/*"]
+    },
+    "customConditions": ["@ultrastack"]
+  }
 }

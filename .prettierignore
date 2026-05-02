@@ -3,3 +3,11 @@
 /coverage
 /.nx/cache
 /.nx/workspace-data
+**/*.tsbuildinfo
+**/tsconfig.tsbuildinfo
+**/android
+**/ios
+**/next-env.d.ts
+
+.nx/self-healing
+.nx/polygraph

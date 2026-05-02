@@ -5,7 +5,7 @@
 
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 
@@ -18,10 +18,11 @@ async function bootstrap() {
     new ValidationPipe({
       errorHttpStatusCode: 400,
       exceptionFactory: (errors) => {
-        const messages = errors.flatMap((error) => Object.values(error.constraints));
+        const messages = errors.flatMap((error) => Object.values(error.constraints || {}));
+
         return new BadRequestException({ message: messages, error: 'Bad Request', statusCode: 400 });
-      },
-    }),
+      }
+    })
   );
 
   const config = new DocumentBuilder()
@@ -32,9 +33,11 @@ async function bootstrap() {
     .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .build();
   const document = SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT || 9000;
+
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);
 }
