@@ -7,3 +7,7 @@
 **/tsconfig.tsbuildinfo
 **/android
 **/ios
+**/next-env.d.ts
+
+.nx/self-healing
+.nx/polygraph

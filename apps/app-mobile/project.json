@@ -53,7 +53,7 @@
     "serve": {
       "options": { "port": 4200, "hostname": "0.0.0.0" }
     },
-    "android:add": {
+    "android-add": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap add android",
@@ -61,14 +61,14 @@
       },
       "dependsOn": ["build"]
     },
-    "android:remove": {
+    "android-remove": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap remove android",
         "cwd": "{projectRoot}"
       }
     },
-    "ios:add": {
+    "ios-add": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap add ios",
@@ -76,7 +76,7 @@
       },
       "dependsOn": ["build"]
     },
-    "ios:remove": {
+    "ios-remove": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap remove ios",
@@ -91,7 +91,7 @@
       },
       "dependsOn": ["build"]
     },
-    "android:sync": {
+    "android-sync": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap sync android",
@@ -99,7 +99,7 @@
       },
       "dependsOn": ["build"]
     },
-    "ios:sync": {
+    "ios-sync": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap sync ios",
@@ -107,7 +107,7 @@
       },
       "dependsOn": ["build"]
     },
-    "android:run:live:emulator": {
+    "android-run-live-emulator": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap run android -l --host=10.0.2.2 --port=4000",
@@ -115,7 +115,7 @@
       },
       "dependsOn": ["serve"]
     },
-    "android:run:live:target": {
+    "android-run-live-target": {
       "executor": "nx:run-commands",
       "options": {
         "command": "node scripts/cross-var.js npx cap run android -l --port=4000 --host=$HOST",
@@ -125,7 +125,7 @@
       },
       "dependsOn": ["serve"]
     },
-    "ios:run:live:emulator": {
+    "ios-run-live-emulator": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap run ios -l --port=4000",
@@ -133,7 +133,7 @@
       },
       "dependsOn": ["serve"]
     },
-    "ios:run:live:target": {
+    "ios-run-live-target": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap run ios -l --port=4000",
@@ -142,41 +142,41 @@
       },
       "dependsOn": ["serve"]
     },
-    "android:open": {
+    "android-open": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap open android",
         "cwd": "{projectRoot}"
       }
     },
-    "ios:open": {
+    "ios-open": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap open ios",
         "cwd": "{projectRoot}"
       }
     },
-    "android:doctor": {
+    "android-doctor": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap doctor android",
         "cwd": "{projectRoot}"
       }
     },
-    "ios:doctor": {
+    "ios-doctor": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx cap doctor ios",
         "cwd": "{projectRoot}"
       }
     },
-    "build:android:app": {
+    "build-android-app": {
       "executor": "nx:run-commands",
       "options": {
         "command": "./gradlew assembleDebug",
         "cwd": "{projectRoot}/android"
       },
-      "dependsOn": ["android:sync"]
+      "dependsOn": ["android-sync"]
     },
     "container": {
       "executor": "@nx-tools/nx-container:build",
