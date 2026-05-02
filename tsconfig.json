@@ -4,7 +4,31 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/app-client-admin"
+      "path": "./apps/app-client"
+    },
+    {
+      "path": "./apps/app-mobile"
+    },
+    {
+      "path": "./apps/app-server"
+    },
+    {
+      "path": "./libs/frontend-shared"
+    },
+    {
+      "path": "./libs/schemas"
+    },
+    {
+      "path": "./libs/constants"
+    },
+    {
+      "path": "./libs/enums"
+    },
+    {
+      "path": "./libs/interfaces"
+    },
+    {
+      "path": "./libs/entities"
     }
   ]
 }

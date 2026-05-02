@@ -42,7 +42,14 @@ Thumbs.db
 .nx/workspace-data
 .claude/worktrees
 .claude/settings.local.json
+tsconfig.tsbuildinfo
 
 # Next.js
 .next
 out
+
+#env
+.env
+.env.local
+.env.development
+*.tsbuildinfo

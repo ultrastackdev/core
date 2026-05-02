@@ -1,0 +1,55 @@
+{
+  "name": "@new-ultrastack/app-client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/app-client",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true});\""
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [{ "command": "tsc -p tsconfig.json --noEmit", "forwardAllArgs": false }],
+        "cwd": "{projectRoot}"
+      },
+      "dependsOn": ["clean", "^typecheck"]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": { "fix": false },
+      "dependsOn": ["typecheck"]
+    },
+    "serve": {
+      "options": { "port": 3000 }
+    },
+    "build": {
+      "dependsOn": ["lint"]
+    },
+    "container": {
+      "executor": "@nx-tools/nx-container:build",
+      "dependsOn": ["build"],
+      "options": {
+        "engine": "docker",
+        "context": "{projectRoot}",
+        "metadata": {
+          "images": ["app-client"],
+          "load": true,
+          "tags": [
+            "type=schedule",
+            "type=ref,event=branch",
+            "type=ref,event=tag",
+            "type=ref,event=pr",
+            "type=sha,prefix=sha-"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+name: Source Control Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - main
+      - develop
+      - staging
+      - production
+
+jobs:
+  validate-commits:
+    name: Validate Commit Messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm i
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Validate commits with commitlint
+        run: |
+          npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+  validate-branch-name:
+    name: Validate Branch Name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate branch name
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          # Branches that are always allowed
+          if [[ "$BRANCH_NAME" =~ ^(main|master|develop|staging|production|release/.+|hotfix/.+)$ ]]; then
+            echo "Branch '$BRANCH_NAME' is a protected branch - allowed"
+            exit 0
+          fi
+          # Branch naming pattern
+          BRANCH_PATTERN="^(feature|bugfix|fix|hotfix|chore|docs|refactor|test|ci|perf|build|style|revert)\/([A-Z]+-[0-9]+-)?[a-z0-9]+(-[a-z0-9]+)*$"
+          if [[ ! "$BRANCH_NAME" =~ $BRANCH_PATTERN ]]; then
+            echo ""
+            echo "::error::Invalid branch name: '$BRANCH_NAME'"
+            echo ""
+            echo "Branch names must follow the pattern: type/ticket-description"
+            echo ""
+            echo "Allowed types: feature, bugfix, fix, hotfix, chore, docs, refactor, test, ci, perf, build, style, revert"
+            echo ""
+            echo "Examples:"
+            echo "  - feature/OA-123-add-user-authentication"
+            echo "  - bugfix/OA-456-fix-login-crash"
+            echo "  - chore/update-dependencies"
+            echo ""
+            exit 1
+          fi
+          echo "Branch name '$BRANCH_NAME' is valid"

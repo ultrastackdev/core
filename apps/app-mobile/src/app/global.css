@@ -1,0 +1,3 @@
+@source "../../../../libs/frontend-shared/src";
+
+@import '../../../../libs/frontend-shared/src/styles/theme.scss';

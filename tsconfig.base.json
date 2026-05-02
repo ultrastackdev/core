@@ -15,7 +15,19 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
+    "baseUrl": ".",
     "target": "es2022",
-    "customConditions": ["@new-ultrastack/source"]
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@entities": ["libs/entities/src"],
+      "@enums": ["libs/enums/src"],
+      "@interfaces": ["libs/interfaces/src"],
+      "@constants": ["libs/constants/src"],
+      "@schemas": ["libs/schemas/src"],
+      "@shared/front": ["libs/frontend-shared/src"],
+      "@shared/front/*": ["libs/frontend-shared/src/*"]
+    },
+    "customConditions": ["@ultrastack"]
   }
 }

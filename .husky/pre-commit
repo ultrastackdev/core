@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+./scripts/validate-staged-file-count.sh
+npx lint-staged --concurrent false --relative
